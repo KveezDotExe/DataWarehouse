@@ -1,3 +1,18 @@
+/*
+ * =====================================
+ * HOW TO EXECUTE THIS PROCEDURE
+ * =====================================
+ * 
+ * ----------------------------
+ * CALL bronze.load_bronze();
+ * 
+ * OR
+ * 
+ * CALL load_bronze(); (if you have already connected to the bronze schema)
+ * ----------------------------
+ */
+
+
 CREATE OR REPLACE PROCEDURE bronze.load_bronze ()
 LANGUAGE plpgsql
 AS $$
@@ -117,3 +132,5 @@ BEGIN
 
 END;
 $$;
+
+
