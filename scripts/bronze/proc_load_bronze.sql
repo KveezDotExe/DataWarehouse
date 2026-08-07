@@ -21,6 +21,9 @@ DECLARE
 	end_time TIMESTAMP;
 	batch_start_time TIMESTAMP;
 	batch_end_time TIMESTAMP;
+    error_msg TEXT;
+    error_state TEXT;
+    error_context TEXT;
 BEGIN
 	
 	RAISE NOTICE '===============================';
@@ -36,7 +39,7 @@ BEGIN
 	start_time := NOW();
 
 	TRUNCATE TABLE bronze.crm_cust_info;
-	COPY bronze.crm_cust_info (cst_id, cst_key, cst_firstname, cst_lastname, cst_material_status, cst_gndr, cst_create_date)
+	COPY bronze.crm_cust_info (cst_id, cst_key, cst_firstname, cst_lastname, cst_marital_status, cst_gndr, cst_create_date)
 	FROM 'D:\postgreSQL\data_warehouse\datasets\source_crm\cust_info.csv'
 	DELIMITER ','
 	CSV HEADER;
@@ -129,8 +132,18 @@ BEGIN
 	RAISE NOTICE '---------------------------------';
 	RAISE NOTICE 'Batch loading time: %', EXTRACT(EPOCH FROM (batch_end_time - batch_start_time))::VARCHAR;
 	RAISE NOTICE '---------------------------------';
-
+	
+	EXCEPTION
+    WHEN OTHERS THEN 
+        GET STACKED DIAGNOSTICS 
+            error_msg = MESSAGE_TEXT,
+            error_state = RETURNED_SQLSTATE,
+            error_context = PG_EXCEPTION_CONTEXT;
+        RAISE NOTICE '=== ERROR INFORMATION ===';
+        RAISE NOTICE 'Message: %', error_msg;
+        RAISE NOTICE 'Code SQLSTATE: %', error_state;
+        RAISE NOTICE 'Context: %', error_context;
+        RAISE NOTICE '============================';
 END;
 $$;
-
 
